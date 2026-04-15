@@ -18,8 +18,11 @@
         .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
         .btn-opt { padding: 18px; border: 2px solid #eee; background: white; border-radius: 10px; cursor: pointer; font-size: 1.1rem; transition: 0.2s; text-align: left; }
         .btn-opt:hover:not(:disabled) { border-color: var(--accent); background: #f7fbff; }
-        .correct-ans { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; }
-        .wrong-ans { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        
+        /* 強制正確/錯誤顏色 */
+        .correct-btn { background-color: var(--success) !important; color: white !important; border-color: var(--success) !important; font-weight: bold; }
+        .wrong-btn { background-color: var(--danger) !important; color: white !important; border-color: var(--danger) !important; }
+        
         .controls { margin-top: 25px; text-align: center; }
         #next-btn { padding: 15px 60px; border: none; background: var(--primary); color: white; border-radius: 30px; cursor: pointer; font-size: 1.1rem; display: none; }
         #result-screen { display: none; text-align: center; padding: 40px 0; }
@@ -54,89 +57,67 @@
 <script>
 const musicData = [
     // --- 符號部分 (sign01 - sign26) ---
-    {q:"sign01.jpg", isImg:true, a:"漸強", o:["漸強","漸弱","重音","斷奏"]},
+    {q:"sign01.jpg", isImg:true, a:"漸強", o:["漸強","漸弱","重音","斷音"]},
     {q:"sign02.jpg", isImg:true, a:"漸弱", o:["漸強","漸弱","延長號","重音"]},
     {q:"sign03.jpg", isImg:true, a:"斷音，斷奏", o:["斷音，斷奏","連音","重音","加強音"]},
     {q:"sign04.jpg", isImg:true, a:"重音", o:["重音","斷音","延長號","漸強"]},
-    {q:"signx.jpg", isImg:true, a:"延長號（將音符或休止符的時值延長）", o:["暫停","終止線","延長號（將音符或休止符的時值延長）","反覆"]},
-    {q:"sign06.jpg", isImg:true, a:"反覆記號", o:["終止線","反覆記號","分句線","暫停"]},
-    {q:"sign07.jpg", isImg:true, a:"保持兩個音符的時值", o:["圓滑地演奏","保持兩個音符的時值","斷音","撥弦"]},
-    {q:"sign08.jpg", isImg:true, a:"圓滑地演奏", o:["圓滑地演奏","保持音值","斷奏處理","撥弦"]},
+    {q:"sign05.jpg", isImg:true, a:"延長號（將音符或休止符的時值延長）", o:["暫停","終止線處理","延長號（將音符或休止符的時值延長）","反覆"]},
+    {q:"sign06.jpg", isImg:true, a:"反覆記號", o:["終止線","反覆記號","分句線處理","暫停"]},
+    {q:"sign07.jpg", isImg:true, a:"保持兩個音符的時值", o:["圓滑地演奏","保持兩個音符的時值處理","斷奏","撥弦"]},
+    {q:"sign08.jpg", isImg:true, a:"圓滑地演奏處理", o:["圓滑地演奏處理","保持音值","斷音","撥弦"]},
     {q:"sign09.jpg", isImg:true, a:"每分鐘120個四分音符", o:["每分鐘120個四分音符","每分鐘120拍","速度快","中板"]},
-    {q:"sign10.jpg", isImg:true, a:"44拍子", o:["二二拍子","44拍子","三四拍子","六八拍子"]},
-    {q:"sign11.jpg", isImg:true, a:"強重音", o:["弱音處理","強重音","輕微壓力","半斷音"]},
+    {q:"sign10.jpg", isImg:true, a:"44拍子", o:["二二拍子","44拍子","三四拍子處理","六八拍子"]},
+    {q:"sign11.jpg", isImg:true, a:"強重音", o:["弱音","強重音處理","輕微壓力","半斷音"]},
     {q:"sign12.jpg", isImg:true, a:"半斷音，稍微斷開", o:["連音","半斷音，稍微斷開","短斷音","重音"]},
-    {q:"sign13.jpg", isImg:true, a:"短斷音（很短的斷音）", o:["半斷音","短斷音（很短的斷音）","重音處理","延長"]},
-    {q:"sign14.jpg", isImg:true, a:"輕微的壓力", o:["輕微的壓力","重音","斷音","圓滑音"]},
-    {q:"sign15.jpg", isImg:true, a:"升高八度演奏", o:["升高八度演奏","降低八度","重複一次","停止處理"]},
-    {q:"sign16.jpg", isImg:true, a:"二二拍子（每個小節有兩個二分音符）", o:["四四拍子","二二拍子（每個小節有兩個二分音符）","行板","快板"]},
-    {q:"sign17.jpg", isImg:true, a:"兩個小節休止", o:["重複兩次處理","兩個小節休止","第二小節","二重奏"]},
-    {q:"sign18.jpg", isImg:true, a:"第一次", o:["第一次","第二次","結束","第一段處理"]},
-    {q:"sign19.jpg", isImg:true, a:"第二次", o:["第一次處理","第二次","結束","第二段"]},
-    {q:"sign20.jpg", isImg:true, a:"下弓", o:["下弓","上弓","撥弦","用弓拉"]},
-    {q:"sign21.jpg", isImg:true, a:"上弓", o:["下弓","上弓","撥弦處理","用弓拉"]},
-    {q:"sign22.jpg", isImg:true, a:"一弓拉完", o:["一弓拉完","跳弓","斷弓","撥弦"]},
-    {q:"sign23.jpg", isImg:true, a:"放開右邊踏板", o:["踩下右邊踏板","放開右邊踏板","踩下左邊","弱音器"]},
-    {q:"sign24.jpg", isImg:true, a:"踩下右邊踏板", o:["踩下右邊踏板","放開右邊踏板","踩下左邊處理","停止"]},
-    {q:"sign25.jpg", isImg:true, a:"踩下右邊踏板，之後再垂直處放開", o:["踩下右邊踏板，之後再垂直處放開","踩下左邊","只踩一半","不放開"]},
-    {q:"sign26.jpg", isImg:true, a:"琵音：由低音開始，先後奏出和弦", o:["琵音：由低音開始，先後奏出和弦","斷奏","重音處理","滑音"]},
+    {q:"sign13.jpg", isImg:true, a:"短斷音（很短的斷音）", o:["半斷音處理","短斷音（很短的斷音）","重音","延長"]},
+    {q:"sign14.jpg", isImg:true, a:"輕微的壓力", o:["輕微的壓力","重音","斷音","圓滑音處理"]},
+    {q:"sign15.jpg", isImg:true, a:"升高八度演奏", o:["升高八度演奏","降低八度","重複一次","拍子記號"]},
+    {q:"sign16.jpg", isImg:true, a:"二二拍子（每個小節有兩個二分音符）", o:["四四拍子","二二拍子（每個小節有兩個二分音符）","慢板","快板"]},
+    {q:"sign17.jpg", isImg:true, a:"兩個小節休止", o:["重複兩次","兩個小節休止","第二小節","二重奏"]},
+    {q:"sign18.jpg", isImg:true, a:"第一次", o:["第一次","第二次處理","結束","第一段"]},
+    {q:"sign19.jpg", isImg:true, a:"第二次", o:["第一次","第二次","結束處理","第二段"]},
+    {q:"sign20.jpg", isImg:true, a:"下弓", o:["下弓","上弓","撥弦處理","用弓拉"]},
+    {q:"sign21.jpg", isImg:true, a:"上弓", o:["下弓","上弓處理","撥弦","用弓拉"]},
+    {q:"sign22.jpg", isImg:true, a:"一弓拉完", o:["一弓拉完","跳弓處理","斷弓","撥弦"]},
+    {q:"sign23.jpg", isImg:true, a:"踩下右邊踏板", o:["踩下右邊踏板","放開右邊踏板","踩下左邊","中踏板"]},
+    {q:"sign24.jpg", isImg:true, a:"放開右邊踏板", o:["踩下右邊踏板","放開右邊踏板","踩下左邊","停止處理"]},
+    {q:"sign25.jpg", isImg:true, a:"踩下右邊踏板，之後再垂直處放開", o:["踩下右邊踏板，之後再垂直處放開","踩下左邊","全放開","不放開處理"]},
+    {q:"sign26.jpg", isImg:true, a:"琵音：由低音開始，先後奏出和弦", o:["琵音：由低音開始，先後奏出和弦","斷奏處理","重音","滑音"]},
 
     // --- 術語部分 ---
-    {q:"doloroso", a:"悲痛的", o:["快樂","溫柔","悲痛的","強大"]},
-    {q:"con dolore", a:"悲痛地", o:["悲痛地","愉快","有力","神秘"]},
+    {q:"sempre", a:"一直，始終", o:["一直，始終","立即","有時","從不"]},
+    {q:"doloroso", a:"悲痛的", o:["快樂","溫柔","悲痛的","強大處理"]},
     {q:"ff (fortissimo)", a:"很強", o:["中強","很強","弱","很弱"]},
     {q:"mp (mezzo piano)", a:"中弱", o:["很弱","中弱","中強","強"]},
-    {q:"larghetto", a:"頗慢，小廣板", o:["中速","頗慢，小廣板","頗快","極快"]},
-    {q:"pp (pianissimo)", a:"很弱", o:["很弱","弱","中弱","強"]},
+    {q:"larghetto", a:"頗慢，小廣板", o:["中速","頗慢，小廣板處理","頗快","極快"]},
     {q:"a tempo", a:"回復原來速度", o:["回復原來速度","漸快","快板","慢板"]},
     {q:"accelerando", a:"漸快", o:["漸快","漸慢","漸強","漸弱"]},
-    {q:"adagio", a:"慢", o:["快","中速","慢","極快"]},
-    {q:"allegretto", a:"稍快，小快板", o:["稍快，小快板","極快","慢板處理","行板"]},
-    {q:"allegro", a:"快，快板", o:["快，快板","慢板","中板","行板"]},
-    {q:"andante", a:"行板，中速", o:["行板，中速","快板","慢板","漸慢"]},
-    {q:"cantabile", a:"如歌的風格", o:["如歌的風格","活潑","沉重","甜美"]},
-    {q:"dim.", a:"漸弱", o:["漸弱","漸強","消失處理","更弱"]},
-    {q:"f (forte)", a:"強，響亮", o:["強，響亮","弱","中強","很強"]},
-    {q:"legato", a:"連貫地，圓滑地", o:["連貫地，圓滑地","斷奏處理","跳躍","加強"]},
-    {q:"moderato", a:"中板，適中的速度", o:["中板，適中的速度","快板","慢板","行板"]},
+    {q:"adagio", a:"慢", o:["快","中速","慢","極快處理"]},
+    {q:"allegro", a:"快，快板", o:["快，快板","慢板","中板","行板處理"]},
+    {q:"andante", a:"行板，中速", o:["行板，中速","快板處理","慢板","漸慢"]},
+    {q:"cantabile", a:"如歌的風格", o:["如歌的風格","活潑處理","沉重","甜美"]},
+    {q:"f (forte)", a:"強，響亮", o:["強，響亮","弱","中強","很強處理"]},
     {q:"p (piano)", a:"弱", o:["弱","強","中弱","很弱"]},
-    {q:"staccato", a:"斷奏，斷音", o:["斷奏，斷音","連奏","重音","延長"]},
-    {q:"allargando", a:"寬廣的", o:["寬廣的","窄小","漸快","輕巧"]},
+    {q:"legato", a:"連貫地，圓滑地", o:["連貫地，圓滑地","斷奏","跳躍","加強處理"]},
+    {q:"allargando", a:"寬廣的", o:["寬廣的","窄小","漸快","輕巧處理"]},
     {q:"con moto", a:"稍快", o:["稍快","慢速","極快","漸慢"]},
-    {q:"largo", a:"慢，寬廣", o:["慢，寬廣","快","中速","行板"]},
-    {q:"lento", a:"慢", o:["慢","快","中速","稍快"]},
-    {q:"più", a:"更多的", o:["更多的","較少的","一樣","非常處理"]},
-    {q:"presto", a:"快，急板", o:["快，急板","慢板","行板","中板"]},
-    {q:"vivace, vivo", a:"有生氣的，輕快的", o:["有生氣的，輕快的","悲傷","莊嚴","緩慢"]},
+    {q:"presto", a:"快，急板", o:["快，急板","慢板處理","行板","中板"]},
+    {q:"vivace, vivo", a:"有生氣的，輕快的", o:["有生氣的，輕快的","悲傷","莊嚴","緩慢處理"]},
     {q:"agitato", a:"激動地", o:["激動地","平靜地","悲傷","甜蜜"]},
-    {q:"animato", a:"生氣勃勃的，活潑的", o:["生氣勃勃的，活潑的","死氣沉沉","緩慢","莊嚴"]},
-    {q:"con forza", a:"有力量地", o:["有力量地","溫柔地","輕快","悲傷處理"]},
-    {q:"energico", a:"精力充沛地", o:["精力充沛地","無力","安靜","輕巧"]},
-    {q:"maestoso", a:"莊嚴的，宏偉的", o:["莊嚴的，宏偉的","輕浮","快速","幽默"]},
-    {q:"prestissimo", a:"非常快，最急版", o:["非常快，最急版","快板","慢板","行板"]},
-    {q:"sempre", a:"一直，始終", o:["一直，始終處理","有時","從不","立即"]},
-    {q:"tranquillo", a:"平靜的", o:["平靜的","激動","活潑處理","強力"]},
-    {q:"stringendo", a:"漸快", o:["漸快","漸慢","漸強","漸弱"]},
-    {q:"vite (法文)", a:"快，快板", o:["快，快板","慢","中速","行板"]},
+    {q:"energico", a:"精力充沛地", o:["精力充沛地","無力","安靜處理","輕巧"]},
+    {q:"stringendo", a:"漸快", o:["漸快","漸慢","漸強處理","漸弱"]},
     {q:"langsam (德文)", a:"慢", o:["慢","快","適中","極快處理"]},
-    {q:"mässig (德文)", a:"中板，適中的速度", o:["中板，適中的速度","快板處理","慢板處理","急板"]},
-    {q:"ruhig (德文)", a:"平靜的，安靜的", o:["平靜的，安靜的","激動","響亮","快速"]},
-    {q:"schnell (德文)", a:"快", o:["快","慢","適中","漸慢"]},
-    {q:"lebhaft (德文)", a:"活潑的", o:["活潑的","沉重","安靜","緩慢處理"]},
-    {q:"traurig (德文)", a:"悲傷地", o:["悲傷地","快樂處理","勇敢","輕快"]},
-    {q:"con, col", a:"用，含有", o:["沒有","用，含有","以及","但是"]},
-    {q:"pesante", a:"沉重有力地", o:["沉重有力地","輕快處理","優雅","快速"]},
-    {q:"ritenuto", a:"立即放慢", o:["立即放慢","漸慢","漸快","回復原速處理"]},
-    {q:"sotto voce", a:"輕聲地，悄悄地", o:["輕聲地，悄悄地","高聲地處理","如歌地","有精神地"]},
-    {q:"arco", a:"用弓拉奏", o:["用弓拉奏","撥弦","重音","圓滑"]},
-    {q:"pizzicato, pizz.", a:"撥弦", o:["撥弦","拉奏","重音","跳音處理"]},
-    {q:"con sord.", a:"加上弱音器", o:["加上弱音器","除去弱音器","撥弦處理","連奏"]},
-    {q:"senza sord.", a:"除去弱音器", o:["除去弱音器","加上弱音器","不踩踏板","撥弦"]},
+    {q:"schnell (德文)", a:"快", o:["快","慢處理","適中","漸慢"]},
+    {q:"traurig (德文)", a:"悲傷地", o:["悲傷地","快樂","勇敢","輕快處理"]},
+    {q:"arco", a:"用弓拉奏", o:["用弓拉奏","撥弦處理","重音","圓滑"]},
+    {q:"pizzicato, pizz.", a:"撥弦", o:["撥弦","拉奏","重音","跳音"]},
+    {q:"con sord.", a:"加上弱音器", o:["加上弱音器","除去弱音器","撥弦","連奏處理"]},
+    {q:"senza sord.", a:"除去弱音器", o:["除去弱音器","加上弱音器","不踩踏板","撥弦處理"]},
     {q:"una corda, u.c.", a:"踩下左邊 (弱音) 踏板", o:["踩下左邊 (弱音) 踏板","踩右踏板","全踩","不踩"]},
-    {q:"tre corda, t.c.", a:"放開左邊 (弱音) 踏板", o:["放開左邊 (弱音) 踏板","踩左踏板","踩右踏板","中踏板"]},
-    {q:"mano destra (m.d.)", a:"右手", o:["右手","左手","雙手","足處理"]},
-    {q:"mano sinistra (m.s.)", a:"左手", o:["左手","右手","雙手","指處理"]},
-    {q:"sul G", a:"在G弦上", o:["在G弦上處理","在D弦上","高音","低音"]}
+    {q:"mano destra (m.d.)", a:"右手", o:["右手","左手","雙手處理","足"]},
+    {q:"mano sinistra (m.s.)", a:"左手", o:["左手","右手","雙手","指"]},
+    {q:"sotto voce", a:"輕聲地，悄悄地", o:["輕聲地，悄悄地","高聲地","如歌地","有精神地"]},
+    {q:"sul G", a:"在G弦上", o:["在G弦上","在D弦上","高音","低音"]}
 ];
 
 let currentIndex = 0;
@@ -156,7 +137,7 @@ function showQuestion() {
     document.getElementById('cur-num').innerText = currentIndex + 1;
     
     if (data.isImg) {
-        displayArea.innerHTML = `<img src="${data.q}" class="q-img" onerror="this.parentElement.innerHTML='⚠️ 找不到圖片: ${data.q}'">`;
+        displayArea.innerHTML = `<img src="${data.q}" class="q-img" onerror="this.parentElement.innerHTML='⚠️ 圖片路徑錯誤: ${data.q}'">`;
         instrArea.innerText = "請選出此符號的正確解釋：";
     } else {
         displayArea.innerHTML = data.q;
@@ -188,13 +169,14 @@ function check(selectedBtn, selectedText, correctText) {
     const c = correctText.trim();
 
     if (s === c) {
-        selectedBtn.classList.add('correct-ans');
+        selectedBtn.classList.add('correct-btn');
         score++;
     } else {
-        selectedBtn.classList.add('wrong-ans');
+        selectedBtn.classList.add('wrong-btn');
+        // 強制找出正確答案變綠
         btns.forEach(b => {
             if (b.innerText.trim() === c) {
-                b.classList.add('correct-ans');
+                b.classList.add('correct-btn');
             }
         });
     }
